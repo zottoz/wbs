@@ -1,35 +1,41 @@
-const puppeteer = require('puppeteer');
+const p = require('puppeteer');
 
 function ws()
 {
   (async () => {
     try {
-      const browser = await puppeteer.launch({
+      const browser = await p.launch({
         headless: true, 
         args: ['--no-sandbox']
       })
 
-      const page = await browser.newPage();
-      await page.goto('https://www.tibiaplay.com/');
-      await page.waitForSelector('#lastResults', { timeout: 1000 });
+      const page = await browser.newPage()
+      await page.goto('https://www.tibiaplay.com/')
+      await page.waitForSelector('#lastResults', { timeout: 1000 })
 
-      let listSelector="#lastResults > li";
+      let seletorDaLista="#lastResults > li"
 
-      var results = await page.evaluate((selector) => {
-        const list = Array.from(document.querySelectorAll(selector));
-        return list.map(data => [parseInt(data.innerHTML), data._prevClass]);
-      }, listSelector);
-
-      console.log(results)
+      var resultado = await page.evaluate((seletor) => {
+        const lista = Array.from(document.querySelectorAll(seletor))
+        return lista.map(data => [parseInt(data.innerHTML), data._prevClass])
+      }, seletorDaLista)
 
 
-      await browser.close();
+      //remove os itens nulos
+      resultado.splice(0,1)
+      resultado.splice(9,9)
+
+      console.log(resultado)
+      console.log("Proxima leitura...")
+
+      await browser.close()
+
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   })();
 }
 
 (function(){
-  setInterval(ws, 10000);
+  setInterval(ws, 10000)
 })();
